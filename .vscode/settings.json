@@ -1,0 +1,9 @@
+{
+    "cSpell.words": [
+    ],
+    "jupyter.notebookFileRoot": "${workspaceFolder}",
+    "editor.rulers": [
+        120
+    ],
+    "pylint.cwd": "${workspaceFolder}"
+}
