@@ -687,7 +687,9 @@
     // f1: full URL length
     // const statReport = f56_statisticalReport(url, domain);
 
-    const f1 = url.length;
+    const canonicalURL = url.replace(/[#?].*$/, "");
+    const f1 = canonicalURL.length;
+
     console.error("f1 (URL length):", f1);
     // f2: hostname length
     const f2 = hostname.length;
@@ -752,12 +754,14 @@
     console.error("f21 (www):", f21);
     const f22 = (url.match(/\.com/gi) || []).length;
     console.error("f22 (.com):", f22);
-    const f23 = (url.match(/http/gi) || []).length;
+    const url_path = new URL(url).pathname.toLowerCase();
+    const f23 = path.includes("http") ? 1 : 0;
     console.error("f23 (http):", f23);
-    const f24 = (url.match(/\/\//g) || []).length;
+    const f24 = url.match(/\/\//g)?.length || 0;
+
     console.error("f24 (//):", f24);
     // f25: https protocol
-    const f25 = parsed.protocol === "https:" ? 0 : 1;
+    const f25 = url.toLowerCase().startsWith("https://") ? 1 : 0;
     console.error("f25 (https token):", f25);
     // f26–f27: digit ratios
     const digitsAll = (url.match(/\d/g) || []).length;
