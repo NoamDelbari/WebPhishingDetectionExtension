@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', ()=> {
     }
     currentTabId = tabs[0].id;
     console.log(currentTabId)
-    setTimeout(analyse, 500);
     chrome.tabs.sendMessage(currentTabId, {action : 'GetPrediction'}, (response) => {
       
       if (chrome.runtime.lastError) {
