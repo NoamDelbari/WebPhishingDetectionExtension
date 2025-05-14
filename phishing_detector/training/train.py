@@ -107,4 +107,13 @@ if __name__ == "__main__":
     dataset_path = r'datasets/dataset_B_05_2020.csv'
     # model = train_model(file_path=dataset_path, batch_size=128, epochs=500, learning_rate=0.001) # Model saved with accuracy: 89.15%
     # model = train_model(file_path=dataset_path, batch_size=128, epochs=500, learning_rate=0.0001) # Model saved with accuracy: 89.94%
-    model = train_model(file_path=dataset_path, batch_size=32, epochs=500, learning_rate=0.0001) # Model saved with accuracy: 89.94%
+    # model = train_model(file_path=dataset_path, batch_size=32, epochs=500, learning_rate=0.0001) # Model saved with accuracy: 89.76%
+    # model = train_model(file_path=dataset_path, batch_size=128, epochs=1000, learning_rate=0.001) # Model saved with accuracy: 90.64%
+    # model = train_model(file_path=dataset_path, batch_size=128, epochs=1000, learning_rate=0.0001) # Model saved with accuracy: 90.81%
+    # model = train_model(file_path=dataset_path, batch_size=512, epochs=1000, learning_rate=0.0001) # Model saved with accuracy: 90.29%
+    # model = train_model(file_path=dataset_path, batch_size=1024, epochs=1000, learning_rate=0.0001) # Model saved with accuracy: 89.15%
+    # model = train_model(file_path=dataset_path, batch_size=256, epochs=1000, learning_rate=0.0001) # Model saved with accuracy: 90.73%
+    # model = train_model(file_path=dataset_path, batch_size=256, epochs=1000, learning_rate=0.00005) # Model saved with accuracy: 90.90%
+    # model = train_model(file_path=dataset_path, batch_size=256, epochs=2000, learning_rate=0.00005) # Model saved with accuracy: 91.95%
+    model = train_model(file_path=dataset_path, batch_size=256, epochs=2000, learning_rate=0.00003) # Model saved with accuracy: 92.30%
+    # model = train_model(file_path=dataset_path, batch_size=256, epochs=2000, learning_rate=0.00001) # Model saved with accuracy: 92.21%
