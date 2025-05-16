@@ -66,5 +66,14 @@ def main():
     print(f"  FPR:      {fpr:.4f}")
     print(f"  F1 Score: {f1:.4f}")
 
+    # Intersection: if either model says phishing (1), result is 1, else 0
+    y_pred_intersection = ((y_pred_lgbm == 1) | (y_pred_nn == 1)).astype(np.int32)
+    acc, tpr, fpr, f1 = compute_metrics(y, y_pred_intersection)
+    print("Intersection (either model says phishing):")
+    print(f"  Accuracy: {acc:.4f}")
+    print(f"  TPR:      {tpr:.4f}")
+    print(f"  FPR:      {fpr:.4f}")
+    print(f"  F1 Score: {f1:.4f}")
+
 if __name__ == "__main__":
     main()
