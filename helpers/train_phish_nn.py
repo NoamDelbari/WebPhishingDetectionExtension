@@ -19,7 +19,7 @@ from torch.utils.data import DataLoader, TensorDataset
 IGNORE = [
     "whois_registered_domain","domain_registration_length","domain_age", "nb_redirection",
     "nb_external_redirection","web_traffic","dns_record","google_index","page_rank","status","url",
-    "statistical_report"
+    "statistical_report", "ratio_intRedirection","ratio_extRedirection"
 ]
 
 URL_FEATURES = [

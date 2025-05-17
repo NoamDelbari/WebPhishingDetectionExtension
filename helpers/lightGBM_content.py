@@ -9,7 +9,8 @@ from skl2onnx import convert_sklearn        # works for both LGBM & pipelines
 from skl2onnx.common.data_types import FloatTensorType
 
 IGNORE = ["whois_registered_domain","domain_registration_length","domain_age",
-          "web_traffic","dns_record","google_index","page_rank","status","url"]
+          "web_traffic","dns_record","google_index","page_rank","status","url",
+          "ratio_intRedirection","ratio_extRedirection"]
 CONTENT_COLS = slice(56, 80)               # after drop(IGNORE)
 
 ap = argparse.ArgumentParser()
@@ -18,6 +19,7 @@ ap.add_argument("--outdir", default="artifacts")
 ns = ap.parse_args(); out = Path(ns.outdir); out.mkdir(exist_ok=True)
 
 df  = pd.read_csv(ns.csv).drop(columns=IGNORE)
+print(f"Content cols: {df.columns[CONTENT_COLS]}")
 X   = df.values.astype(np.float32)[:, CONTENT_COLS]
 y   = (pd.read_csv(ns.csv)["status"]=="phishing").astype(np.int32).values
 
@@ -50,14 +52,14 @@ onx = convert_lightgbm(
         initial_types=initial,
         zipmap=False,            # disable ZipMap so ORT gets a tensor
         target_opset=13)
-open("content_lgbm.onnx","wb").write(onx.SerializeToString())
+open(f"{out}/content_lgbm.onnx","wb").write(onx.SerializeToString())
 
-Path("content_lgbm.onnx").write_bytes(onx.SerializeToString())
+Path(f"{out}/content_lgbm.onnx").write_bytes(onx.SerializeToString())
 print("✔  ZipMap removed:",
       all(n.op_type != "ZipMap" for n in onx.graph.node))
 
 import onnx
 
-m = onnx.load("content_lgbm.onnx")
+m = onnx.load(f"{out}/content_lgbm.onnx")
 assert "ZipMap" not in [n.op_type for n in m.graph.node]
 print("✔ tensor output, ready for onnxruntime-web")
