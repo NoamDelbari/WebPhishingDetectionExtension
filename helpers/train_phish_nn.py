@@ -17,12 +17,30 @@ import torch, torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
 IGNORE = [
-    "whois_registered_domain","domain_registration_length","domain_age",
-    "web_traffic","dns_record","google_index","page_rank","status","url",
+    "whois_registered_domain","domain_registration_length","domain_age", "nb_redirection",
+    "nb_external_redirection","web_traffic","dns_record","google_index","page_rank","status","url",
+    "statistical_report"
 ]
 
-URL_COLS     = slice(0, 56)   # after IGNORE filtering
-CONTENT_COLS = slice(56, 80)
+URL_FEATURES = [
+    "length_url","length_hostname","ip","nb_dots","nb_hyphens","nb_at",
+    "nb_qm","nb_and","nb_or","nb_eq","nb_underscore","nb_tilde","nb_percent",
+    "nb_slash","nb_star","nb_colon","nb_comma","nb_semicolumn","nb_dollar",
+    "nb_space","nb_www","nb_com","nb_dslash","http_in_path","https_token",
+    "ratio_digits_url","ratio_digits_host","punycode","port","tld_in_path",
+    "tld_in_subdomain","abnormal_subdomain","nb_subdomains","prefix_suffix",
+    "random_domain","shortening_service","path_extension","length_words_raw",
+    "char_repeat","shortest_words_raw","shortest_word_host",
+    "shortest_word_path","longest_words_raw","longest_word_host",
+    "longest_word_path","avg_words_raw","avg_word_host","avg_word_path",
+    "phish_hints","domain_in_brand","brand_in_subdomain","brand_in_path",
+    "suspecious_tld",
+]
+
+URL_FEATURES = [c.strip() for c in URL_FEATURES]        # tidy
+
+URL_COLS     = slice(0, 53)   # after IGNORE filtering
+CONTENT_COLS = slice(53, 76)
 
 class MLP(nn.Module):
     def __init__(self, d_in, widths=(64, 32)):
@@ -221,7 +239,17 @@ def main():
     out = Path(ns.outdir); out.mkdir(exist_ok=True)
     raw = pd.read_csv(ns.csv)
     y   = (raw["status"] == "phishing").astype(np.float32).values
-    X   = raw.drop(columns=IGNORE).values.astype(np.float32)
+    raw_dropped = raw.drop(columns=IGNORE)
+    missing = [c for c in URL_FEATURES if c not in raw_dropped.columns]
+    if missing:
+        raise ValueError(f"CSV is missing URL feature(s): {raw_dropped}")
+    X   = raw_dropped.values.astype(np.float32)
+    cols_after_drop = raw_dropped.columns
+
+
+    print(f"URL FEATURES: {cols_after_drop[URL_COLS]}")   # 54 URL features
+    print(f"CONTENT FEATURES: {cols_after_drop[URL_COLS]}")   # 54 URL features
+
 
     train_one(
         "url_model", X[:, URL_COLS], y, out,

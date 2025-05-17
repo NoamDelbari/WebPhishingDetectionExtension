@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+.env/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs and debug files
+*.log
+*.out
+*.err
+
+# Dataset and experiment files
+datasets/*.csv
+datasets/*_config.json
+experiments/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# VS Code settings
+.vscode/extensions.json
