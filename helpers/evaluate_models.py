@@ -66,10 +66,43 @@ def main():
     print(f"  FPR:      {fpr:.4f}")
     print(f"  F1 Score: {f1:.4f}")
 
-    # Intersection: if either model says phishing (1), result is 1, else 0
-    y_pred_intersection = ((y_pred_lgbm == 1) | (y_pred_nn == 1)).astype(np.int32)
+    # Union: if either model says phishing (1), result is 1, else 0
+    y_pred_union = ((y_pred_lgbm == 1) | (y_pred_nn == 1)).astype(np.int32)
+    acc, tpr, fpr, f1 = compute_metrics(y, y_pred_union)
+    print("Union (either model says phishing):")
+    print(f"  Accuracy: {acc:.4f}")
+    print(f"  TPR:      {tpr:.4f}")
+    print(f"  FPR:      {fpr:.4f}")
+    print(f"  F1 Score: {f1:.4f}")
+
+    # Intersection: only if both models say phishing (1), result is 1, else 0
+    y_pred_intersection = ((y_pred_lgbm == 1) & (y_pred_nn == 1)).astype(np.int32)
     acc, tpr, fpr, f1 = compute_metrics(y, y_pred_intersection)
-    print("Intersection (either model says phishing):")
+    print("Intersection (both models must say phishing):")
+    print(f"  Accuracy: {acc:.4f}")
+    print(f"  TPR:      {tpr:.4f}")
+    print(f"  FPR:      {fpr:.4f}")
+    print(f"  F1 Score: {f1:.4f}")
+
+    # Get probabilities instead of binary predictions
+    def onnx_predict_proba(onnx_path, X):
+        sess = ort.InferenceSession(str(onnx_path))
+        input_name = sess.get_inputs()[0].name
+        out = sess.run(None, {input_name: X.astype(np.float32)})[0]
+        return out.flatten()  # probabilities
+
+    # Get probabilities
+    proba_lgbm = onnx_predict_proba(ns.lgbm, X_lgbm)
+    proba_nn   = onnx_predict_proba(ns.nn, X_nn)
+
+    # Weighted average (example: 0.7 for LGBM, 0.3 for NN)
+    w_lgbm = 0.3
+    w_nn = 0.7
+    proba_weighted = w_lgbm * proba_lgbm + w_nn * proba_nn
+    y_pred_weighted = (proba_weighted >= 0.5).astype(np.int32)
+
+    acc, tpr, fpr, f1 = compute_metrics(y, y_pred_weighted)
+    print(f"Weighted average (LGBM {w_lgbm:.2f}, NN {w_nn:.2f}):")
     print(f"  Accuracy: {acc:.4f}")
     print(f"  TPR:      {tpr:.4f}")
     print(f"  FPR:      {fpr:.4f}")
