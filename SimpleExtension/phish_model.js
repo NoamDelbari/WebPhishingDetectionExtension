@@ -28,8 +28,8 @@ const URL_FEATS = [
   "nb_space",
   "nb_www",
   "nb_com",
-  "nb_dslash",
   "http_in_path",
+  "nb_dslash",
   "https_token",
   "ratio_digits_url",
   "ratio_digits_host",
@@ -43,8 +43,6 @@ const URL_FEATS = [
   "random_domain",
   "shortening_service",
   "path_extension",
-  "nb_redirection",
-  "nb_external_redirection",
   "length_words_raw",
   "char_repeat",
   "shortest_words_raw",
@@ -61,7 +59,6 @@ const URL_FEATS = [
   "brand_in_subdomain",
   "brand_in_path",
   "suspecious_tld",
-  "statistical_report",
 ];
 
 // ─── 24 content-side features (f57 – f80) ──────────────────────
@@ -71,8 +68,6 @@ const CT_FEATS = [
   "ratio_extHyperlinks",
   "ratio_nullHyperlinks",
   "nb_extCSS",
-  "ratio_intRedirection",
-  "ratio_extRedirection",
   "ratio_intErrors",
   "ratio_extErrors",
   "login_form",
@@ -122,11 +117,17 @@ async function run(kind, dict) {
   const names = kind === "url" ? URL_FEATS : CT_FEATS;
   const { mean, std } = scalers[kind];
 
-  if (!window.__dumpedURL) {
-    window.__dumpedURL = true; // dump only once
-    const rawVec = URL_FEATS.map((k) => dict[k] ?? 0);
-    console.log("[DEBUG] copy-paste into Python:\n", JSON.stringify(rawVec));
-  }
+  // if (!window.__dumpedURL) {
+  //   window.__dumpedURL = true; // dump only once
+  //   const rawVec = URL_FEATS.map((k) => dict[k] ?? 0);
+  //   console.log("[DEBUG] copy-paste URL into Python:\n", JSON.stringify(rawVec));
+  // }
+  // if (!window.__dumpedCT) {
+  //   window.__dumpedCT = true; // dump only once
+  //   const rawVec = CT_FEATS.map((k) => dict[k] ?? 0);
+  //   console.log("[DEBUG] copy-paste CONTENT into Python:\n", JSON.stringify(rawVec));
+  // }
+
 
   /* --- build feature vector ---------------------------------- */
   const v = new Float32Array(names.length);
@@ -141,16 +142,16 @@ async function run(kind, dict) {
   });
 
   /* --- DEBUG: list every output ------------------------------- */
-  console.groupCollapsed(`[${kind}] ORT raw outputs`);
-  Object.entries(out).forEach(([k, v]) => {
-    console.log(
-      k,
-      v instanceof ort.Tensor
-        ? { dims: v.dims, type: v.type, data: Array.from(v.data) }
-        : v
-    );
-  });
-  console.groupEnd();
+  // console.groupCollapsed(`[${kind}] ORT raw outputs`);
+  // Object.entries(out).forEach(([k, v]) => {
+  //   console.log(
+  //     k,
+  //     v instanceof ort.Tensor
+  //       ? { dims: v.dims, type: v.type, data: Array.from(v.data) }
+  //       : v
+  //   );
+  // });
+  // console.groupEnd();
 
   /* --- pick the tensor that really holds probabilities -------- */
   // ❶ Prefer the explicit ‘probabilities’ output if present
@@ -182,7 +183,7 @@ async function run(kind, dict) {
     );
   }
 
-  console.log(`[${kind}]  chosen prob =`, prob);
+  // console.log(`[${kind}]  chosen prob =`, prob);
   // convert BigInt → Number in the extremely rare case we picked an int64
   return typeof prob === "bigint" ? Number(prob) : prob;
 }
